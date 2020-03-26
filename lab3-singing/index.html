@@ -1,0 +1,36 @@
+<title> CS494 -- Lab 3: Network Flow - The Topcoder "Singing" Problem</title>
+
+<h2> CS494 -- Lab 3: Network Flow - The Topcoder "Singing" Problem</h2>
+<UL> <LI> CS494/594
+<LI> Fall, 2019
+<LI> <a href=http://web.eecs.utk.edu/~jplank>James S. Plank</a>
+<LI> <a href=http://web.eecs.utk.edu/~jplank/plank/classes/cs494/Labs/Lab-3-Singing/index.html>This file:
+     <b>http://web.eecs.utk.edu/~jplank/plank/classes/cs494/Labs/Lab-3-Singing</b></a>
+<LI> Lab Directory: <b>/home/plank/cs494/Labs/Lab-3-Singing</b>
+</UL>
+</h3>
+
+The writeup here is pretty simple -- solve the 
+<b>Singing</b> problem from Topcoder SRM 653, 
+(D1, 450 point problem)</a>.   
+The  problem description is at the following URL: <a href=https://community.topcoder.com/stat?c=problem_statement&pm=13680&rd=16317>https://community.topcoder.com/stat?c=problem_statement&pm=13680&rd=16317</a>.
+Simply read all of the input values (<b>N</b>, <b>low</b>, <b>high</b> 
+and the <b>pitches</b>) on standard input as words.
+<p>
+So, doing the topcoder examples:
+
+<pre>
+UNIX> <font color=darkred><b>echo 3 2 2  1 2 3 2 1 2 | ./Singing</b></font>
+2
+UNIX> <font color=darkred><b>echo 10 3 7  4 4 5 5 6 5 3 6 | ./Singing</b></font>
+0
+UNIX> <font color=darkred><b>echo 6 2 5  5 3 1 6 4 2 | ./Singing</b></font>
+1
+UNIX> <font color=darkred><b>echo 10 4 5  1 4 3 5 2 5 7 5 9 | ./Singing</b></font>
+3
+UNIX> <font color=darkred><b>echo 100 20 80 2 27 3 53 53 52 52 60 85 89 100 53 60 2 3 53 100 89 40 42 2 53 2 85 | ./Singing</b></font>
+5
+UNIX> <font color=darkred><b></b></font>
+</pre>
+
+There is a gradescript that conforms to the constraints.

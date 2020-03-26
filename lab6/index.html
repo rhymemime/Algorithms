@@ -1,0 +1,486 @@
+<title>CS494 Lab 6</title>
+<h2>CS494 Lab 6</h2>
+
+The lab follows the topcoder writeup:
+<hr>
+
+<h3>SRM 720, D2, 1000-Pointer (RainbowGraph)</h3>
+<h3>James S. Plank</h3>
+Mon Dec  3 15:25:44 EST 2018
+<hr>
+
+<UL>
+<LI><a href=https://community.topcoder.com/stat?c=problem_statement&pm=14667&rd=16957>Problem Statement</a>.
+<LI> <a href=main.cpp>A <b>main()</b> with the examples compiled in.</a>
+<p>
+<LI> <b>Problem Given in Topcoder</b>: January, 2017
+<LI> <b>Competitors who opened the problem</b>: 169
+<LI> <b>Competitors who submitted a solution</b>: 8
+<LI> <b>Number of correct solutions</b>: 1
+<LI> <b>Accuracy (percentage correct vs those who opened)</b>: 0.5%
+<LI> <b>Accuracy (percentage correct vs those who submitted)</b>: 12.5%
+<LI> <b>Average Correct Time</b>: 44 minutes, 28 seconds.
+</UL>
+
+<hr>
+Grad students Clara Nguyen and Natalie Bogda wrote up a very nice presentation 
+of this problem, with some interesting commentary.  The web link is
+<a href=http://utk.claranguyen.me/talks.php?id=bitdp>http://utk.claranguyen.me/talks.php?id=bitdp</a>.  That's not how I recommend to solve the problem, but it makes for some interesting reading!
+`
+<hr>
+<h3>In case topcoder's servers are down</h3>
+
+Here is a summary of the problem:
+
+<UL>
+<LI> You are given an undirected graph with <i>n</i> nodes, numbered 0 through <i>n-1</i>.
+<LI> Each node is assigned a color, which is a number from 0 through 9.  These colors are
+given in a vector <b>color</b>.
+<LI> Edges in the graph are specified by two vectors <b>a</b> and <b>b</b>, where the edges
+connect nodes <b>a[i]</b> and <b>b[i]</b>.
+<LI> There are at most 2500 edges in the graph.
+<LI> No more than 10 nodes may have the same color.
+<LI> A <i>walk</i> in the graph is a path that visits every node in the graph exactly 
+     once, and may be partitioned into subpaths, where the nodes in each subpath all have the 
+     same color.  
+<LI> A <i>legal walk</i> is one where there are no two subpaths that contain nodes of the 
+     same color.
+<LI> Return the number of legal walks.
+</UL>
+
+Examples:
+
+<p><center><table border=3>
+<tr>
+<td align=center>0</td>
+<td align=center>{0,0,0,1,1,1,2,2,2}</td>
+<td align=center>{0,1,2,3,4,5,6,7,8,0,3,6}</td>
+<td align=center>{1,2,0,4,5,3,7,8,6,3,6,0}</td>
+<td align=center>0</td>
+</tr>
+<tr>
+<td align=center>1</td>
+<td align=center>{0,0,0,1,1,1,2,2,2}</td>
+<td align=center>{0,1,2,3,4,5,6,7,8,0,4,8}</td>
+<td align=center>{1,2,0,4,5,3,7,8,6,3,7,2}</td>
+<td align=center>24</td>
+</tr>
+<tr>
+<td align=center>2</td>
+<td align=center>{0,3,9,8,6,4}</td>
+<td align=center>{0,0,0,0,0,1,1,1,1,2,2,2,3,3,4}</td>
+<td align=center>{1,2,3,4,5,2,3,4,5,3,4,5,4,5,5}</td>
+<td align=center>720</td>
+</tr>
+<tr>
+<td align=center>3</td>
+<td align=center>{0,0,0,0,3,3,3,6,6,9}</td>
+<td align=center>{9,9,9,9,9,9,9,9,9,7,7,7,7,7,7,7,4,4,4,4,0,1,2,4,5,8}</td>
+<td align=center>{0,1,2,3,4,5,6,7,8,0,1,2,3,4,5,6,0,1,2,3,1,2,3,5,6,7}</td>
+<td align=center>64</td>
+</tr>
+<tr>
+<td align=center>4</td>
+<td align=center>{3,1,4,1,5,9,2,6,5,3,5}</td>
+<td align=center>{1}</td>
+<td align=center>{2}</td>
+<td align=center>0</td>
+</tr>
+<tr>
+<td align=center>5</td>
+<td align=center>Too big.</td>
+<td align=center>See <b>main.cpp</b></td>
+<td align=center></td>
+<td align=center>983979105</td>
+</tr>
+</table></center><p>
+
+<hr>
+<h3>Introduction</h3>
+
+This is a wonderful problem -- a mixture of DFS and dynamic programming.  You have to program
+it carefully, or you won't get it in under the time limit!
+<p>
+Obviously, you are going to focus on the connected components, which are denoted by the
+node colors.  Once a path reaches a node of one color, it must travel through every node in 
+that color's connected component, before it can go to a node with another color.
+The constraints help you: There is a maximum of ten components, and each component has a
+maximum of ten nodes.
+<hr>
+<h3>An Example</h3>
+<p>
+I put this into <b>main.cpp</b> as example 7:
+
+<p><center><table border=3><td><img src=Ex-7.jpg></td></table></center><p>
+
+<pre>
+color = { 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2 }
+a =     { 0, 1, 2, 3, 3, 6, 6, 4, 7, 7, 10, 10, 8, 2, 6 }
+b =     { 1, 2, 0, 4, 5, 4, 5, 5, 8, 9,  8,  9, 9, 3, 7 }
+</pre>
+
+I've colored the inter-component edges black, and the intra-component edges the same color
+as the component nodes.
+<p>
+Let's logic our way through the answer.  It should be clear that the only paths are going
+to go through the green-red-blue components in that order, or blue-red-green.  Let's focus
+on the paths through the components, when they are going through green-red-blue.
+
+<UL> 
+<LI> There are two ways through the green component: 0-1-2 and 1-0-2.
+<LI> There are two ways through the red component: 3-4-5-6 and 3-5-4-6.
+<LI> There are four ways through the blue component: 7-8-9-10, 7-8-10-9, 7-9-8-10 and 7-9-10-8.
+</UL>
+
+That means that there are 2*2*4 = 16 paths that go through green-red-blue.
+If you think about it, the paths that go through blue-red-green are the exact same paths
+as green-red-blue, just in reverse.  So the answer is 32 paths.
+
+<hr>
+<h3> The solution, part 1</h3>
+
+I solved this in two parts.  In the first part, I created a two-dimensional array <b>NP</b>.
+<b>NP[i][j]</b> is non-zero only if nodes <i>i</i> and <i>j</i> are in the same connected
+component.   It contains the number of paths from node <i>i</i> to node <i>j</i>, where each
+path must contain every node in the component. 
+<p>
+In our example above, we'll have the following:
+
+<UL>
+<LI> <b>NP[0][1]</b> = <b>NP[0][2]</b> = 1.
+<LI> <b>NP[1][0]</b> = <b>NP[1][2]</b> = 1.
+<LI> <b>NP[2][0]</b> = <b>NP[2][1]</b> = 1.
+<p>
+<LI> <b>NP[3][4]</b> = <b>NP[3][5]</b> = <b>NP[4][3]</b> = <b>NP[5][3]</b> = 1.
+<LI> <b>NP[6][4]</b> = <b>NP[6][5]</b> = <b>NP[4][6]</b> = <b>NP[5][6]</b> = 1.
+<LI> <b>NP[3][6]</b> = <b>NP[6][3]</b> = 2.
+<p>
+<LI> <b>NP[7][8]</b> = <b>NP[7][9]</b> = <b>NP[8][7]</b> = <b>NP[9][7]</b> = 1.
+<LI> <b>NP[10][8]</b> = <b>NP[10][9]</b> = <b>NP[8][10]</b> = <b>NP[9][10]</b> = 1.
+<LI> <b>NP[7][10]</b> = <b>NP[10][7]</b> = 2.
+</UL>
+
+For a given node <i>i</i>, you can calculate <b>NP[i][j]</b> for all <i>j</i> using a 
+an enhanced DFS which travels every intracomponent path from node <i>i</i>.  
+While you're traveling each path, you keep track of the path length, and if you reach
+a node <i>j</i> and the path length contains every node in the component, you increment 
+<b>NP[i][j]</b>.
+<p>
+Let me run through an example, where the starting node is node 3.  When I did this,
+I had a <b>V</b> (visited) field for each node, and a variable <b>NIP</b> (nodes in the path).
+I set them all to zero.  Here is what happens when I call <b>DFS(3)</b>.  I call
+it an "enhanced" DFS, because when you're done with a node, you set <b>V</b> back to 
+zero, so it can participate in more paths.
+
+<pre>
+DFS(3):        NIP:0 -- Begin.  Increment NIP and Set V[3] to 1.
+DFS(3):        NIP:1 -- Will call DFS on: 4 5
+DFS(3):        NIP:1 -- Calling DFS(4)
+  DFS(4):      NIP:1 -- Begin.  Increment NIP and Set V[4] to 1.
+  DFS(4):      NIP:2 -- Will call DFS on: 6 5
+  DFS(4):      NIP:2 -- Calling DFS(6)
+    DFS(6):    NIP:2 -- Begin.  Increment NIP and Set V[6] to 1.
+    DFS(6):    NIP:3 -- Will call DFS on: 5
+    DFS(6):    NIP:3 -- Calling DFS(5)
+      DFS(5):  NIP:3 -- Begin.  Increment NIP and Set V[5] to 1.
+      DFS(5):  NIP:4 -- Setting NP[3][5] to 1.
+      DFS(5):  NIP:3 -- Done.  Setting V[5] = 0
+    DFS(6):    NIP:2 -- Done.  Setting V[6] = 0
+  DFS(4):      NIP:2 -- Calling DFS(5)
+    DFS(5):    NIP:2 -- Begin.  Increment NIP and Set V[5] to 1.
+    DFS(5):    NIP:3 -- Will call DFS on: 6
+    DFS(5):    NIP:3 -- Calling DFS(6)
+      DFS(6):  NIP:3 -- Begin.  Increment NIP and Set V[6] to 1.
+      DFS(6):  NIP:4 -- Setting NP[3][6] to 1.
+      DFS(6):  NIP:3 -- Done.  Setting V[6] = 0
+    DFS(5):    NIP:2 -- Done.  Setting V[5] = 0
+  DFS(4):      NIP:1 -- Done.  Setting V[4] = 0
+DFS(3):        NIP:1 -- Calling DFS(5)
+  DFS(5):      NIP:1 -- Begin.  Increment NIP and Set V[5] to 1.
+  DFS(5):      NIP:2 -- Will call DFS on: 6 4
+  DFS(5):      NIP:2 -- Calling DFS(6)
+    DFS(6):    NIP:2 -- Begin.  Increment NIP and Set V[6] to 1.
+    DFS(6):    NIP:3 -- Will call DFS on: 4
+    DFS(6):    NIP:3 -- Calling DFS(4)
+      DFS(4):  NIP:3 -- Begin.  Increment NIP and Set V[4] to 1.
+      DFS(4):  NIP:4 -- Setting NP[3][4] to 1.
+      DFS(4):  NIP:3 -- Done.  Setting V[4] = 0
+    DFS(6):    NIP:2 -- Done.  Setting V[6] = 0
+  DFS(5):      NIP:2 -- Calling DFS(4)
+    DFS(4):    NIP:2 -- Begin.  Increment NIP and Set V[4] to 1.
+    DFS(4):    NIP:3 -- Will call DFS on: 6
+    DFS(4):    NIP:3 -- Calling DFS(6)
+      DFS(6):  NIP:3 -- Begin.  Increment NIP and Set V[6] to 1.
+      DFS(6):  NIP:4 -- Setting NP[3][6] to 2.
+      DFS(6):  NIP:3 -- Done.  Setting V[6] = 0
+    DFS(4):    NIP:2 -- Done.  Setting V[4] = 0
+  DFS(5):      NIP:1 -- Done.  Setting V[5] = 0
+DFS(3):        NIP:0 -- Done.  Setting V[3] = 0
+</pre>
+
+This is most definitely an expensive algorithm.  Think about it -- if there are ten
+nodes in a component, and the nodes are completely connected, then <b>NP[i][j]</b> 
+will equal 8! for each <i>i</i> and <i>j</i>.  That is because there is a path for
+every permutation of the other nodes.  Of course, 8! equals 40,320, which is definitely
+doable in the universe of topcoder.  
+<hr>
+<h3> The solution, part 2.</h3>
+
+The second part uses dynamic programming.  Define the following procedure:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+long long NumWalks(int starting_node, int remaining_components);
+</pre></td></table></center><p>
+
+This is going to return the number of legal paths that start with 
+<b>starting_node</b>, go through <b>starting_node</b>'s component, and 
+then go through <b>remaining_components</b>.  
+<b>remaining_components</b> is an integer that stores a set of components
+using bit arithmetic.  It should not include <b>starting_node</b>'s component.
+You are going to sum up <b>NumWalks(n, s)</b> for every node
+<b>n</b>, and every set <b>s</b> composed of all of the components except for
+<b>n</b>'s component.
+<p>
+
+To implement <b>NumWalks(n, s)</b>, what you do is look at every 
+node <b>m</b> in node <b>n</b>'s component.  If <b>NP[n][m]</b> 
+is greater than zero, then you look at every node <b>l</b> which is
+connected to <b>m</b> and in a component in <b>s</b>.  You then
+call <b>NumWalks(l, s - l's component)</b>.  You will add the product of
+that and <b>NP[n][m]</b>  to the return value for <b>NumWalks(n, s)</b>.
+
+<p>
+You need a base case for this -- if <b>s</b> = {}, then 
+<b>NumWalks(n, s)</b> is the sum of all <b>NP[n][m]</b>.
+<p>
+
+Let's do an example -- we'll calculate <b>NumWalks(0, { red, blue } )</b>.
+There are only two values of <b>NP[0][j]</b> which is greater than zero -- <b>NP[0][1]</b>
+and <b>NP[0][2]</b> both equal one.  First, consider <b>NP[0][1]</b>.  There is 
+no edge from 1 to the red or blue components.  So, there are no paths involving <b>NP[0][1]</b>.
+<p>
+Next, consider <b>NP[0][2]</b>.  There is an edge from 2 to 3, so the return value for
+<b>NumWalks(0, { red, blue } )</b> is going to equal 
+<b>NP[0][2]</b> (which is one) times
+<b>NumWalks(3, { blue } )</b>.  So let's focus on 
+<b>NumWalks(3, { blue } )</b>:
+<p>
+Although <b>NP[3][4]</b> and <b>NP[3][5]</b> equal one, neither four nor five are connected
+to the blue component.  So, the only value of <b>NP</b> that matters is <b>NP[3][6]</b>, 
+which equals 2.   
+<b>NumWalks(3, { blue } )</b> is going to equal 
+<b>NP[3][6]</b> times
+<b>NumWalks(7, { } )</b>.
+<p>
+So, we focus on on <b>NumWalks(7, { } )</b>.  This is the base case of the recursion -- it 
+equals the sum of all <b>NP[7][m]</b>.  This is 4.  So
+<b>NumWalks(3, { blue } )</b> equals 4*2 = 8.  And 
+<b>NumWalks(0, { red, blue } )</b> equals 8*1 = 8.
+<p>
+This is dynamic programming, so you cache the return values of <b>NumWalks()</b>.  
+The nodes are numbers from 0 to 9, and the component sets are numbers from 0 to 1023.  
+So, your cache isn't that big -- best to make it a two-dimensional vector.
+<p>
+Below is the dynamic programming cache for example 7.  Go ahead and walk through it.
+
+
+<p><center><table border=3 cellpadding=3>
+<tr><td align=center><tt>n</bb></td><td align=center><tt>remaining_components (int)</tt></td>
+<td align=center><tt>remaining_components (set)</tt></td><td align=center><tt>NumWalks(n, remaining_components)</tt></tr>
+<tr><td align=center>0</td><td align=center>0x6</td><td align=center>{red,blue}</td><td align=center>8</tr>
+<tr><td align=center>1</td><td align=center>0x6</td><td align=center>{red,blue}</td><td align=center>8</tr>
+<tr><td align=center>2</td><td align=center>0x0</td><td align=center>{}</td><td align=center>2</tr>
+<tr><td align=center>2</td><td align=center>0x4</td><td align=center>{blue}</td><td align=center>0</tr>
+<tr><td align=center>2</td><td align=center>0x6</td><td align=center>{red,blue}</td><td align=center>0</tr>
+<tr><td align=center>3</td><td align=center>0x4</td><td align=center>{blue}</td><td align=center>8</tr>
+<tr><td align=center>3</td><td align=center>0x5</td><td align=center>{green,blue}</td><td align=center>0</tr>
+<tr><td align=center>4</td><td align=center>0x5</td><td align=center>{green,blue}</td><td align=center>0</tr>
+<tr><td align=center>5</td><td align=center>0x5</td><td align=center>{green,blue}</td><td align=center>0</tr>
+<tr><td align=center>6</td><td align=center>0x1</td><td align=center>{green}</td><td align=center>4</tr>
+<tr><td align=center>6</td><td align=center>0x5</td><td align=center>{green,blue}</td><td align=center>0</tr>
+<tr><td align=center>7</td><td align=center>0x0</td><td align=center>{}</td><td align=center>4</tr>
+<tr><td align=center>7</td><td align=center>0x1</td><td align=center>{green}</td><td align=center>0</tr>
+<tr><td align=center>7</td><td align=center>0x3</td><td align=center>{green,red}</td><td align=center>0</tr>
+<tr><td align=center>8</td><td align=center>0x3</td><td align=center>{green,red}</td><td align=center>4</tr>
+<tr><td align=center>9</td><td align=center>0x3</td><td align=center>{green,red}</td><td align=center>4</tr>
+<tr><td align=center>10</td><td align=center>0x3</td><td align=center>{green,red}</td><td align=center>8</tr>
+</table></center><p>
+
+<hr>
+<h3>CS494 Lab 6</h3>
+
+<i>You are only to hand in <b>RG.cpp</b>.  You may not modify any of the other files in this
+   lab.</i>
+<p>
+Your job is to implement the <b>RainbowGraph</b> class in the file <b>RG.cpp</b>.
+The <b>RainbowGraph</b> class is defined in
+<b><a href=RG.h>RG.h</a></b>.  You are not allowed to modify this file.
+
+<p><center><table border=3 cellpadding=3><td><pre>
+#include &lt;string&gt;
+#include &lt;vector&gt;
+#include &lt;iostream&gt;
+#include &lt;cstdio&gt;
+#include &lt;cstdlib&gt;
+using namespace std;
+
+class RainbowGraph {
+  public:
+    int countWays(vector &lt;int&gt; color, vector &lt;int&gt; a, vector &lt;int&gt; b);
+    string Verbose;
+
+    vector &lt;int&gt; Color;              <font color=blue>// This is a copy of the input parameter "color".</font>
+    vector &lt; vector &lt;int&gt; &gt; Same;    <font color=blue>// Adjacency lists of intracomponent edges.</font>
+    vector &lt; vector &lt;int&gt; &gt; Diff;    <font color=blue>// Adjacency lists of intercomponent edges.</font>
+    vector &lt; vector &lt;int&gt; &gt; CNodes;  <font color=blue>// Cnodes[i] contains all nodes whose color is i.</font>
+    vector &lt; vector &lt;int&gt; &gt; NP;      <font color=blue>// NP[i][j] = number of paths from i to j that go</font>
+                                     <font color=blue>// through all of the nodes in the component.</font>
+
+    vector &lt;int&gt; V;                  <font color=blue>// The visited vector for the DFS.</font>
+    int NIP;                         <font color=blue>// During the DFS, this is the number of nodes in the current path.</font>
+    int Source;                      <font color=blue>// This is the initial node for each DFS call.</font>
+    int Target;                      <font color=blue>// The size of Source's component: Cnodes[Source].size()</font>
+
+    vector &lt; vector &lt;long long &gt; &gt; Cache;  <font color=blue>// The DP cache.</font>
+
+    void CountPaths(int n);          <font color=blue>// This is the extended DFS.  Set Source, Target, V and NIP</font>
+                                     <font color=blue>// before you call CountPaths(Source) to set NP[Source][j].</font>
+
+    long long NumWalks(int node, int setid);   <font color=blue>// Number of walks starting at node node that </font>
+                                               <font color=blue>// still need to go through the nodes in setid.</font>
+};
+</pre></td></table></center><p>
+
+You should have <b>RG.cpp</b> include "RB.h", and then 
+implement <b>countWays()</b> as I have described above.  Besides <b>countWays()</b>
+and <b>Verbose</b>, you don't have to implement or use any of the member variables or methods
+in this class.  They are the ones that I used, though, and they are all that you need.
+You are not allowed to add things to this class.
+<p>
+Besides implementing <b>countWays()</b> so that it works correctly, you should
+also implement the following inside <b>countWays()</b>:
+
+<UL>
+<LI> If the <b>Verbose</b> string contains the character 'N', then you should print out
+all non-zero values of <b>NP</b>, one per line, in the form:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+NP[i][j] = value
+</pre></td></table></center><p>
+
+<LI> If the <b>Verbose</b> string contains the character 'C', then you should print out
+your dynamic programming cache, one entry per line, in the form:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+Cache[node][setid] = value
+</pre></td></table></center><p>
+
+The <b>setid</b> should be in hex, preceded by "0x".  
+</UL>
+
+You can implement other functionality
+for debugging, but I'll only test you on those two, and that you return the proper answer.
+My code prints out the DFS if the verbose string contains 'D'.  You don't have to do that
+(and you may not want to, because it may slow your code down too much).
+<p>
+<hr>
+<h3>Testing with RG-Tester.cpp, and with Grade-Timer.sh</h3>
+
+The makefile will make two executables:
+
+<UL>
+<LI> <b>RG-Tester</b>.  This uses the <b>main()</b> defined in <b>RG-Tester.cpp</b>.
+You give it the verbose string as its first argument (or none) and <b>color</b>, <b>a</b>
+and <b>b</b> on standard input.  These should be in the form "{ v0, v1, v2 }", where the
+braces and the values should be distinct words.  The commas are optional -- I simply 
+call <b>sscanf()</b> on the word to convert it to an integer.
+<p>
+<LI> <b>a.out</b>.  This makes <b>RainbowGraph.cpp</b> out of <b>RG.h</b> and <b>RG.cpp</b>
+(concatenating them, and then deleting the line that includes <b>RB.h</b>), and compiles
+it with <b>main.cpp</b>, so you can test how it does with the topcoder examples.  
+Examples 1-7 are in 
+<b>main.cpp</b>, along with Example 11 from the Topcoder system test which is a challenging
+one time-wise.
+</UL>
+
+For grading, we're only going to use your <b>RG-Tester</b>.    
+The gradescript tests the 'A' 'N' and 'C' verbose flags of <b>RG-Tester</b>.
+Additionally, there is a shell script in the lab directory called
+<b>Grade-Timer.sh</b>.  It times all of the gradescript examples whose numbers are 
+one, mod three.  Your <b>RG-Tester</b> needs to complete each example in under 2 seconds
+(mine works in under .75 seconds for each).  Don't try this on a heavily loaded machine.
+
+<p>
+I have examples 1-7 and example 11 as files in the lab directory (example 11 is 
+<b><a href=exb.txt>exb.txt</a></b>):
+<p>
+
+<pre>
+UNIX> <font color=darkred><b>RG-Tester < ex7.txt</b></font>
+32
+UNIX> <font color=darkred><b>RG-Tester N < ex7.txt</b></font>
+NP[0][1] = 1
+NP[0][2] = 1
+NP[1][0] = 1
+NP[1][2] = 1
+NP[2][0] = 1
+NP[2][1] = 1
+NP[3][4] = 1
+NP[3][5] = 1
+NP[3][6] = 2
+NP[4][3] = 1
+NP[4][6] = 1
+NP[5][3] = 1
+NP[5][6] = 1
+NP[6][3] = 2
+NP[6][4] = 1
+NP[6][5] = 1
+NP[7][8] = 1
+NP[7][9] = 1
+NP[7][10] = 2
+NP[8][7] = 1
+NP[8][10] = 1
+NP[9][7] = 1
+NP[9][10] = 1
+NP[10][7] = 2
+NP[10][8] = 1
+NP[10][9] = 1
+UNIX> <font color=darkred><b>RG-Tester C < ex7.txt</b></font>
+Cache[0][0x6] = 8
+Cache[1][0x6] = 8
+Cache[2][0x0] = 2
+Cache[2][0x4] = 0
+Cache[2][0x6] = 0
+Cache[3][0x4] = 8
+Cache[3][0x5] = 0
+Cache[4][0x5] = 0
+Cache[5][0x5] = 0
+Cache[6][0x1] = 4
+Cache[6][0x5] = 0
+Cache[7][0x0] = 4
+Cache[7][0x1] = 0
+Cache[7][0x3] = 0
+Cache[8][0x3] = 4
+Cache[9][0x3] = 4
+Cache[10][0x3] = 8
+UNIX> <font color=darkred><b></b></font>
+</pre>
+<hr>
+<h3>Four bullets of advice</h3>
+
+<UL>
+<LI> Be forewarned that the makefile will clobber <b>RainbowGraph.cpp</b>.  It will
+copy it to <b>RainbowGraph.cpp.backup</b> first, but be ready for it.
+<p>
+<LI> The constraints pushed my program to the limits -- my first solution used a map for
+the Dynamic Programming cache, and that was too slow.
+<p>
+<LI> My second was also too slow, because my DFS was too slow.  I fixed that by testing to
+see if <b>V[i]</b> was one before calling <b>CountPaths(i)</b>.  Previously, I simply
+put "if (V[i] == 1) return" as the first line of <b>CountPaths(i)</b>, and all of the
+extra recursive calls made my program too slow.
+<p>
+<LI> As a corollary, if you have printing code in your DFS to help you debug, you need to
+     comment it out before you do the topcoder test (as opposed to doing something like
+     "if (Verbose.find('D') != string::npos) ...".
+</UL>

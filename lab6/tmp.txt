@@ -1,0 +1,300 @@
+9
+test!
+test!
+test!
+test!
+test!
+test!
+test!
+test!
+test!
+test!
+test!
+test!
+NP[0][1] = 1 
+NP[0][2] = 1 
+NP[1][0] = 1 
+NP[1][2] = 1 
+NP[2][0] = 1 
+NP[2][1] = 1 
+NP[3][4] = 1 
+NP[3][5] = 1 
+NP[4][3] = 1 
+NP[4][5] = 1 
+NP[5][3] = 1 
+NP[5][4] = 1 
+NP[6][7] = 1 
+NP[6][8] = 1 
+NP[7][6] = 1 
+NP[7][8] = 1 
+NP[8][6] = 1 
+NP[8][7] = 1 
+Same: 
+1 2 
+0 2 
+1 0 
+4 5 
+3 5 
+4 3 
+7 8 
+6 8 
+7 6 
+CNodes: 
+0 1 2 
+3 4 5 
+6 7 8 
+3
+initial setid 7
+before call
+n: 0 6
+after if
+m: 0
+m: 1
+m: 2
+l: 8, l's color: 2
+NP[n][m]: 1
+n: 8 2
+after if
+m: 6
+m: 7
+l: 4, l's color: 1
+NP[n][m]: 1
+n: 4 0
+TEST!!!!!!!!!
+returning 2
+Cache[8][2] = 2
+m: 8
+returning 0
+Cache[0][6] = 2
+returning 0
+after call
+before call
+n: 1 6
+after if
+m: 0
+l: 3, l's color: 1
+NP[n][m]: 1
+n: 3 4
+after if
+m: 3
+m: 4
+l: 7, l's color: 2
+NP[n][m]: 1
+n: 7 0
+TEST!!!!!!!!!
+returning 2
+Cache[3][4] = 2
+m: 5
+returning 0
+Cache[1][6] = 2
+m: 1
+m: 2
+l: 8, l's color: 2
+NP[n][m]: 1
+n: 8 2
+after if
+m: 6
+m: 7
+l: 4, l's color: 1
+NP[n][m]: 1
+n: 4 0
+TEST!!!!!!!!!
+returning 2
+Cache[8][2] = 2
+m: 8
+returning 0
+Cache[1][6] = 4
+returning 0
+after call
+before call
+n: 2 6
+after if
+m: 0
+l: 3, l's color: 1
+NP[n][m]: 1
+n: 3 4
+after if
+m: 3
+m: 4
+l: 7, l's color: 2
+NP[n][m]: 1
+n: 7 0
+TEST!!!!!!!!!
+returning 2
+Cache[3][4] = 2
+m: 5
+returning 0
+Cache[2][6] = 2
+m: 1
+m: 2
+returning 0
+after call
+before call
+n: 3 5
+after if
+m: 3
+m: 4
+l: 7, l's color: 2
+NP[n][m]: 1
+n: 7 1
+after if
+m: 6
+m: 7
+m: 8
+l: 2, l's color: 0
+NP[n][m]: 1
+n: 2 0
+TEST!!!!!!!!!
+returning 2
+Cache[7][1] = 2
+returning 0
+Cache[3][5] = 2
+m: 5
+returning 0
+after call
+before call
+n: 4 5
+after if
+m: 3
+l: 0, l's color: 0
+NP[n][m]: 1
+n: 0 4
+after if
+m: 0
+m: 1
+m: 2
+l: 8, l's color: 2
+NP[n][m]: 1
+n: 8 0
+TEST!!!!!!!!!
+returning 2
+Cache[0][4] = 2
+returning 0
+Cache[4][5] = 2
+m: 4
+m: 5
+returning 0
+after call
+before call
+n: 5 5
+after if
+m: 3
+l: 0, l's color: 0
+NP[n][m]: 1
+n: 0 4
+after if
+m: 0
+m: 1
+m: 2
+l: 8, l's color: 2
+NP[n][m]: 1
+n: 8 0
+TEST!!!!!!!!!
+returning 2
+Cache[0][4] = 2
+returning 0
+Cache[5][5] = 2
+m: 4
+l: 7, l's color: 2
+NP[n][m]: 1
+n: 7 1
+after if
+m: 6
+m: 7
+m: 8
+l: 2, l's color: 0
+NP[n][m]: 1
+n: 2 0
+TEST!!!!!!!!!
+returning 2
+Cache[7][1] = 2
+returning 0
+Cache[5][5] = 4
+m: 5
+returning 0
+after call
+before call
+n: 6 3
+after if
+m: 6
+m: 7
+l: 4, l's color: 1
+NP[n][m]: 1
+n: 4 1
+after if
+m: 3
+l: 0, l's color: 0
+NP[n][m]: 1
+n: 0 0
+TEST!!!!!!!!!
+returning 2
+Cache[4][1] = 2
+m: 4
+m: 5
+returning 0
+Cache[6][3] = 2
+m: 8
+l: 2, l's color: 0
+NP[n][m]: 1
+n: 2 2
+after if
+m: 0
+l: 3, l's color: 1
+NP[n][m]: 1
+n: 3 0
+TEST!!!!!!!!!
+returning 2
+Cache[2][2] = 2
+m: 1
+m: 2
+returning 0
+Cache[6][3] = 4
+returning 0
+after call
+before call
+n: 7 3
+after if
+m: 6
+m: 7
+m: 8
+l: 2, l's color: 0
+NP[n][m]: 1
+n: 2 2
+after if
+m: 0
+l: 3, l's color: 1
+NP[n][m]: 1
+n: 3 0
+TEST!!!!!!!!!
+returning 2
+Cache[2][2] = 2
+m: 1
+m: 2
+returning 0
+Cache[7][3] = 2
+returning 0
+after call
+before call
+n: 8 3
+after if
+m: 6
+m: 7
+l: 4, l's color: 1
+NP[n][m]: 1
+n: 4 1
+after if
+m: 3
+l: 0, l's color: 0
+NP[n][m]: 1
+n: 0 0
+TEST!!!!!!!!!
+returning 2
+Cache[4][1] = 2
+m: 4
+m: 5
+returning 0
+Cache[8][3] = 2
+m: 8
+returning 0
+after call
+24
